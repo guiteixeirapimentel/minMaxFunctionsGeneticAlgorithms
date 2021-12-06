@@ -6,12 +6,14 @@
 #include "Candidate.hpp"
 
 constexpr auto numberOfVariablesN = 10;
-constexpr auto maxGenerations = 500;
+constexpr auto maxGenerations = 5000;
 constexpr auto populationSize = 500;
 
 constexpr auto maxValue = 5.12f;
 constexpr auto minValue = -5.12f;
-constexpr auto tolerance = 1e-3;
+constexpr auto tolerance = 1e-5;
+
+constexpr auto showPartialMaxFitting = false;
 
 typedef float real;
 
@@ -51,6 +53,15 @@ int main()
 	population.resize(populationSize);
 	auto newPopulation = population;
 
+	const auto showFitting = [](const auto maxFitting, const auto currGen, const auto& population) -> void
+	{
+		std::cout << "---------------------------------" << std::endl;
+		std::cout << "Current Generation: " << currGen << std::endl;
+		std::cout << "Max fitting: " << maxFitting << std::endl;
+		std::cout << "Min Value: " << function(population.front().getValues()) << std::endl;
+		std::cout << "---------------------------------" << std::endl;
+	};
+
 	const auto sortDescByFitting = [](auto &iterable) -> void
 	{
 		std::sort(iterable.begin(), iterable.end(), [](const auto &p1, const auto &p2) -> bool
@@ -58,8 +69,6 @@ int main()
 	};
 	
 	sortDescByFitting(population);
-
-	auto currentGeneration = 0;
 
 	auto generation = 0;
 	for (; generation != maxGenerations; generation++)
@@ -88,14 +97,18 @@ int main()
 		if (std::abs(maxFitting - 1.0) <= tolerance)
 			break;
 
-		std::cout << "Max fitting: " << maxFitting << std::endl;
-		std::cout << "Min Value: " << function(population.front().getValues()) << std::endl;
+		if (showPartialMaxFitting)
+		{
+			showFitting(maxFitting, generation, population);
+		}		
 	}
 
-	const auto maxFitting = population.front().getFitting(function);
+	if (!showPartialMaxFitting)
+	{
+		const auto maxFitting = population.front().getFitting(function);
 
-	std::cout << "Max fitting: " << maxFitting << std::endl;
-	std::cout << "Min Value: " << function(population.front().getValues()) << std::endl;
+		showFitting(maxFitting, generation, population);
+	}	
 
 	return 0;
 }

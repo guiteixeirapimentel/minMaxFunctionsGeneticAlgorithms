@@ -7,10 +7,11 @@
 
 constexpr auto numberOfVariablesN = 10;
 constexpr auto maxGenerations = 500;
-constexpr auto populationSize = 5000;
+constexpr auto populationSize = 500;
 
 constexpr auto maxValue = 5.12f;
 constexpr auto minValue = -5.12f;
+constexpr auto tolerance = 1e-3;
 
 typedef float real;
 
@@ -84,7 +85,7 @@ int main()
 
 		const auto maxFitting = population.front().getFitting(function);
 
-		if (maxFitting == 1.0f)
+		if (std::abs(maxFitting - 1.0) <= tolerance)
 			break;
 
 		std::cout << "Max fitting: " << maxFitting << std::endl;
